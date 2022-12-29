@@ -1,11 +1,24 @@
-import Head from 'next/head'
-import Image from 'next/image'
-import { Inter } from '@next/font/google'
-import styles from '../styles/Home.module.css'
-
-const inter = Inter({ subsets: ['latin'] })
+import Head from "next/head";
+import Image from "next/image";
+import { useUser, useSupabaseClient } from "@supabase/auth-helpers-react";
 
 export default function Home() {
+  const supabase = useSupabaseClient();
+  const user = useUser();
+
+  async function signInWithSpotify() {
+    try {
+      const { error, data } = await supabase.auth.signInWithOAuth({
+        provider: "spotify",
+      });
+      if (error) {
+        alert("Error with auth: " + error.message);
+      }
+    } catch {
+      console.log("error", error);
+      alert(error.error_description || error);
+    }
+  }
   return (
     <>
       <Head>
@@ -14,110 +27,82 @@ export default function Home() {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <main className={styles.main}>
-        <div className={styles.description}>
-          <p>
-            Get started by editing&nbsp;
-            <code className={styles.code}>pages/index.js</code>
-          </p>
-          <div>
-            <a
-              href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              By{' '}
-              <Image
-                src="/vercel.svg"
-                alt="Vercel Logo"
-                className={styles.vercelLogo}
-                width={100}
-                height={24}
-                priority
-              />
-            </a>
+      <main class="bg-spotifyBlack">
+        {user ? (
+          <nav class="container relative mx-auto p-3 text-white">
+            <div class="flex items-center justify-between">
+              <div>
+                <p>Logo</p>
+              </div>
+
+              <div className="w-[40rem]">
+                <form>
+                  <label
+                    for="default-search"
+                    class="sr-only mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                  >
+                    Search
+                  </label>
+                  <div class="relative">
+                    <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+                      <svg
+                        aria-hidden="true"
+                        class="h-5 w-5 text-gray-500 dark:text-gray-400"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                        ></path>
+                      </svg>
+                    </div>
+                    <input
+                      type="search"
+                      id="default-search"
+                      class="block w-full rounded-3xl border border-gray-300 bg-gray-50 p-3 pl-10 text-sm text-gray-900"
+                      placeholder="Search artist, song, album..."
+                      required
+                    />
+                    {/* <button
+                      type="submit"
+                      class="absolute right-2.5 bottom-2.5 rounded-lg bg-spotifyGreen px-4 py-2 text-sm font-medium text-white hover:bg-green-600 focus:outline-none focus:ring-4 focus:ring-green-300"
+                    >
+                      Search
+                    </button> */}
+                  </div>
+                </form>
+              </div>
+
+              <div>
+                <button
+                  onClick={async () => {
+                    await supabase.auth.signOut();
+                  }}
+                >
+                  Sign Out
+                </button>
+              </div>
+            </div>
+          </nav>
+        ) : (
+          <div class="flex h-screen items-center justify-center">
+            <div class="text-center">
+              <h1 class="text-white">App Name</h1>
+              <button
+                class="text-s inline-block rounded-full bg-spotifyGreen px-8 py-3 font-medium leading-tight text-white shadow-md transition duration-150 ease-in-out hover:bg-green-600 hover:shadow-lg focus:bg-green-600 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-green-700 active:shadow-lg"
+                onClick={signInWithSpotify}
+              >
+                Log In with Spotify
+              </button>
+            </div>
           </div>
-        </div>
-
-        <div className={styles.center}>
-          <Image
-            className={styles.logo}
-            src="/next.svg"
-            alt="Next.js Logo"
-            width={180}
-            height={37}
-            priority
-          />
-          <div className={styles.thirteen}>
-            <Image
-              src="/thirteen.svg"
-              alt="13"
-              width={40}
-              height={31}
-              priority
-            />
-          </div>
-        </div>
-
-        <div className={styles.grid}>
-          <a
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className={styles.card}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <h2 className={inter.className}>
-              Docs <span>-&gt;</span>
-            </h2>
-            <p className={inter.className}>
-              Find in-depth information about Next.js features and&nbsp;API.
-            </p>
-          </a>
-
-          <a
-            href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className={styles.card}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <h2 className={inter.className}>
-              Learn <span>-&gt;</span>
-            </h2>
-            <p className={inter.className}>
-              Learn about Next.js in an interactive course with&nbsp;quizzes!
-            </p>
-          </a>
-
-          <a
-            href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className={styles.card}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <h2 className={inter.className}>
-              Templates <span>-&gt;</span>
-            </h2>
-            <p className={inter.className}>
-              Discover and deploy boilerplate example Next.js&nbsp;projects.
-            </p>
-          </a>
-
-          <a
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className={styles.card}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <h2 className={inter.className}>
-              Deploy <span>-&gt;</span>
-            </h2>
-            <p className={inter.className}>
-              Instantly deploy your Next.js site to a shareable URL
-              with&nbsp;Vercel.
-            </p>
-          </a>
-        </div>
+        )}
       </main>
     </>
-  )
+  );
 }
