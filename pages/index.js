@@ -1,8 +1,10 @@
 import Head from "next/head";
 import Image from "next/image";
 import { useUser, useSupabaseClient } from "@supabase/auth-helpers-react";
+import { useRef } from "react";
 
 export default function Home() {
+  const inputRef = useRef();
   const supabase = useSupabaseClient();
   const user = useUser();
 
@@ -18,6 +20,25 @@ export default function Home() {
       console.log("error", error);
       alert(error.error_description || error);
     }
+  }
+
+  function searchSpotify(e) {
+    e.preventDefault();
+    const searchValue = inputRef.current.value;
+    console.log(searchValue)
+    // fetch("/api/search", {
+    //   method: "POST",
+    //   headers: { "Content-Type": "application/json" },
+    //   body: JSON.stringify({
+    //     query: searchValue
+    //   })
+    // }).then(async (response) => {
+    //   if (response.ok) {
+        
+    //   } else {
+        
+    //   }
+    // });
   }
   return (
     <>
@@ -36,7 +57,7 @@ export default function Home() {
               </div>
 
               <div className="w-[40rem]">
-                <form>
+                <form onSubmit={searchSpotify}>
                   <label
                     for="default-search"
                     class="sr-only mb-2 text-sm font-medium text-gray-900 dark:text-white"
@@ -62,6 +83,7 @@ export default function Home() {
                       </svg>
                     </div>
                     <input
+                      ref={inputRef}
                       type="search"
                       id="default-search"
                       class="block w-full rounded-3xl border border-gray-300 bg-gray-50 p-3 pl-10 text-sm text-gray-900"
