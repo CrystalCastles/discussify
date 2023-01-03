@@ -1,12 +1,25 @@
 import Head from "next/head";
 import Image from "next/image";
-import { useUser, useSupabaseClient } from "@supabase/auth-helpers-react";
-import { useRef } from "react";
+import { useUser, useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
+import { useEffect, useRef, useState } from "react";
+import CategoryResults from "../components/CategoryResults";
 
 export default function Home() {
   const inputRef = useRef();
   const supabase = useSupabaseClient();
-  const user = useUser();
+  const session = useSession();
+  const token = session?.provider_token;
+
+  const [searchResults, setSearchResults] = useState();
+  console.log(session)
+  // useEffect(() => {
+  //   async function signOut() {
+  //     return await supabase.auth.signOut();
+  //   }
+  //   if(!session?.provider_token) {
+  //     signOut();
+  //   }
+  // }, [])
 
   async function signInWithSpotify() {
     try {
@@ -25,21 +38,25 @@ export default function Home() {
   function searchSpotify(e) {
     e.preventDefault();
     const searchValue = inputRef.current.value;
-    console.log(searchValue)
-    // fetch("/api/search", {
-    //   method: "POST",
-    //   headers: { "Content-Type": "application/json" },
-    //   body: JSON.stringify({
-    //     query: searchValue
-    //   })
-    // }).then(async (response) => {
-    //   if (response.ok) {
-        
-    //   } else {
-        
-    //   }
-    // });
+    
+    fetch("/api/search", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        query: searchValue,
+        token
+      })
+    }).then(async (response) => {
+      if (response.ok) {
+        const data = await response.json();
+        setSearchResults(data);
+      } else {
+        console.log("Error: please try again")
+        setSearchResults(null);
+      }
+    });
   }
+
   return (
     <>
       <Head>
@@ -49,9 +66,10 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main class="bg-spotifyBlack">
-        {user ? (
-          <nav class="container relative mx-auto p-3 text-white">
-            <div class="flex items-center justify-between">
+        {session ? (
+          <>
+          <nav className="container relative mx-auto p-3 text-white">
+            <div className="flex items-center justify-between">
               <div>
                 <p>Logo</p>
               </div>
@@ -64,11 +82,11 @@ export default function Home() {
                   >
                     Search
                   </label>
-                  <div class="relative">
-                    <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+                  <div className="relative">
+                    <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
                       <svg
                         aria-hidden="true"
-                        class="h-5 w-5 text-gray-500 dark:text-gray-400"
+                        className="h-5 w-5 text-gray-500 dark:text-gray-400"
                         fill="none"
                         stroke="currentColor"
                         viewBox="0 0 24 24"
@@ -86,7 +104,7 @@ export default function Home() {
                       ref={inputRef}
                       type="search"
                       id="default-search"
-                      class="block w-full rounded-3xl border border-gray-300 bg-gray-50 p-3 pl-10 text-sm text-gray-900"
+                      className="block w-full rounded-3xl border border-gray-300 bg-gray-50 p-3 pl-10 text-sm text-gray-900"
                       placeholder="Search artist, song, album..."
                       required
                     />
@@ -111,6 +129,21 @@ export default function Home() {
               </div>
             </div>
           </nav>
+          {searchResults ?
+            <div className="max-h-100 overflow-y-auto bg-spotifyGreen">
+              <h1>Albums</h1>
+              <CategoryResults categories={searchResults.albums}/>
+              <h1>Artists</h1>
+              <CategoryResults categories={searchResults.artists}/>
+              <h1>Tracks</h1>
+              <CategoryResults categories={searchResults.tracks}/>
+              <h1>Shows</h1>
+              <CategoryResults categories={searchResults.shows}/>
+              <h1>Audiobooks</h1>
+              <CategoryResults categories={searchResults.audiobooks}/>
+            </div>
+          : null}
+          </>
         ) : (
           <div class="flex h-screen items-center justify-center">
             <div class="text-center">
