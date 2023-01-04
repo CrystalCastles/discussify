@@ -77,7 +77,7 @@ export default function Home() {
               <div className="w-[40rem]">
                 <form onSubmit={searchSpotify}>
                   <label
-                    for="default-search"
+                    htmlFor="default-search"
                     class="sr-only mb-2 text-sm font-medium text-gray-900 dark:text-white"
                   >
                     Search
@@ -129,20 +129,22 @@ export default function Home() {
               </div>
             </div>
           </nav>
-          {searchResults ?
-            <div className="max-h-100 overflow-y-auto bg-spotifyGreen">
-              <h1>Albums</h1>
-              <CategoryResults categories={searchResults.albums}/>
-              <h1>Artists</h1>
-              <CategoryResults categories={searchResults.artists}/>
-              <h1>Tracks</h1>
-              <CategoryResults categories={searchResults.tracks}/>
-              <h1>Shows</h1>
-              <CategoryResults categories={searchResults.shows}/>
-              <h1>Audiobooks</h1>
-              <CategoryResults categories={searchResults.audiobooks}/>
-            </div>
-          : null}
+          <div className="flex justify-center h-screen">
+            {searchResults ?
+              <div className="max-w-[110rem] max-h-[70rem] overflow-y-auto bg-spotifyGreen overflow-x-hidden">
+                <h1>Albums</h1>
+                <CategoryResults categories={searchResults.albums}/>
+                <h1>Artists</h1>
+                <CategoryResults categories={searchResults.artists}/>
+                <h1>Tracks</h1>
+                <CategoryResults categories={searchResults.tracks}/>
+                <h1>Shows</h1>
+                <CategoryResults categories={searchResults.shows}/>
+                <h1>Audiobooks</h1>
+                <CategoryResults categories={searchResults.audiobooks}/>
+              </div>
+            : null}
+          </div>
           </>
         ) : (
           <div class="flex h-screen items-center justify-center">
