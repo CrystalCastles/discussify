@@ -1,8 +1,13 @@
 import Head from "next/head";
-import Image from "next/image";
-import { useUser, useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
+import {
+  useUser,
+  useSupabaseClient,
+  useSession,
+} from "@supabase/auth-helpers-react";
 import { useEffect, useRef, useState } from "react";
 import CategoryResults from "../components/CategoryResults";
+import { createServerSupabaseClient } from '@supabase/auth-helpers-nextjs';
+import CuratedResults from "../components/CuratedResults";
 
 export default function Home() {
   const inputRef = useRef();
@@ -10,22 +15,22 @@ export default function Home() {
   const session = useSession();
   const token = session?.provider_token;
 
-  const [searchResults, setSearchResults] = useState();
-  console.log(session)
-  // useEffect(() => {
-  //   async function signOut() {
-  //     return await supabase.auth.signOut();
-  //   }
-  //   if(!session?.provider_token) {
-  //     signOut();
-  //   }
-  // }, [])
+  const [recentlyPlayed, setRecentlyPlayed] = useState();
+
+  useEffect(() => {
+    getRecentlyPlayed(token);
+  }, [session])
 
   async function signInWithSpotify() {
     try {
-      const { error, data } = await supabase.auth.signInWithOAuth({
-        provider: "spotify",
-      });
+      const { error, data } = await supabase.auth.signInWithOAuth(
+        {
+          provider: "spotify",
+          options: {
+            scopes: "user-read-recently-played",
+          }
+        },
+      );
       if (error) {
         alert("Error with auth: " + error.message);
       }
@@ -35,24 +40,22 @@ export default function Home() {
     }
   }
 
-  function searchSpotify(e) {
-    e.preventDefault();
-    const searchValue = inputRef.current.value;
-    
-    fetch("/api/search", {
+  async function getRecentlyPlayed(token) {
+    fetch("/api/spotify", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        query: searchValue,
-        token
+        token,
+        recent: true
       })
     }).then(async (response) => {
       if (response.ok) {
         const data = await response.json();
-        setSearchResults(data);
+        console.log(data)
+        setRecentlyPlayed(data);
       } else {
         console.log("Error: please try again")
-        setSearchResults(null);
+        setRecentlyPlayed(null);
       }
     });
   }
@@ -65,93 +68,28 @@ export default function Home() {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <main class="bg-spotifyBlack">
+      <main class="bg-mainBlack">
         {session ? (
-          <>
-          <nav className="container relative mx-auto p-3 text-white">
-            <div className="flex items-center justify-between">
-              <div>
-                <p>Logo</p>
-              </div>
-
-              <div className="w-[40rem]">
-                <form onSubmit={searchSpotify}>
-                  <label
-                    htmlFor="default-search"
-                    class="sr-only mb-2 text-sm font-medium text-gray-900 dark:text-white"
-                  >
-                    Search
-                  </label>
-                  <div className="relative">
-                    <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                      <svg
-                        aria-hidden="true"
-                        className="h-5 w-5 text-gray-500 dark:text-gray-400"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                          stroke-width="2"
-                          d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                        ></path>
-                      </svg>
-                    </div>
-                    <input
-                      ref={inputRef}
-                      type="search"
-                      id="default-search"
-                      className="block w-full rounded-3xl border border-gray-300 bg-gray-50 p-3 pl-10 text-sm text-gray-900"
-                      placeholder="Search artist, song, album..."
-                      required
-                    />
-                    {/* <button
-                      type="submit"
-                      class="absolute right-2.5 bottom-2.5 rounded-lg bg-spotifyGreen px-4 py-2 text-sm font-medium text-white hover:bg-green-600 focus:outline-none focus:ring-4 focus:ring-green-300"
-                    >
-                      Search
-                    </button> */}
-                  </div>
-                </form>
-              </div>
-
-              <div>
-                <button
-                  onClick={async () => {
-                    await supabase.auth.signOut();
-                  }}
-                >
-                  Sign Out
-                </button>
-              </div>
+          <div className="min-h-[calc(100vh-70px)] grid 2xl:grid-cols-3 gap-6 xs: mx-5 lg:mx-[16rem] 2xl:mx-16 overflow-hidden">
+            <div className="bg-spotifyBlack rounded-lg p-2">
+              <h1 className="text-white text-center text-2xl font-semibold">Recently played</h1>
+              { recentlyPlayed && <CuratedResults media={recentlyPlayed}/> }
             </div>
-          </nav>
-          <div className="flex justify-center h-screen">
-            {searchResults ?
-              <div className="max-w-[110rem] max-h-[70rem] overflow-y-auto bg-spotifyGreen overflow-x-hidden">
-                <h1>Albums</h1>
-                <CategoryResults categories={searchResults.albums}/>
-                <h1>Artists</h1>
-                <CategoryResults categories={searchResults.artists}/>
-                <h1>Tracks</h1>
-                <CategoryResults categories={searchResults.tracks}/>
-                <h1>Shows</h1>
-                <CategoryResults categories={searchResults.shows}/>
-                <h1>Audiobooks</h1>
-                <CategoryResults categories={searchResults.audiobooks}/>
-              </div>
-            : null}
+            <div className="bg-spotifyBlack rounded-lg p-2">
+              <h1 className="text-white text-center text-2xl font-semibold ml-5">Recently active</h1>
+              { recentlyPlayed && <CuratedResults media={recentlyPlayed}/> }
+            </div>
+            <div className="bg-spotifyBlack rounded-lg p-2">
+              <h1 className="text-white text-center text-2xl font-semibold">Hot topics</h1>
+              { recentlyPlayed && <CuratedResults media={recentlyPlayed}/> }
+            </div>
           </div>
-          </>
         ) : (
-          <div class="flex h-screen items-center justify-center">
-            <div class="text-center">
-              <h1 class="text-white">App Name</h1>
+          <div className="flex h-screen items-center justify-center">
+            <div className="text-center">
+              <h1 className="text-white">App Name</h1>
               <button
-                class="text-s inline-block rounded-full bg-spotifyGreen px-8 py-3 font-medium leading-tight text-white shadow-md transition duration-150 ease-in-out hover:bg-green-600 hover:shadow-lg focus:bg-green-600 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-green-700 active:shadow-lg"
+                className="text-s inline-block rounded-full bg-spotifyGreen px-8 py-3 font-medium leading-tight text-white shadow-md transition duration-150 ease-in-out hover:bg-green-600 hover:shadow-lg focus:bg-green-600 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-green-700 active:shadow-lg"
                 onClick={signInWithSpotify}
               >
                 Log In with Spotify
