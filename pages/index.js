@@ -51,7 +51,6 @@ export default function Home() {
     }).then(async (response) => {
       if (response.ok) {
         const data = await response.json();
-        console.log(data)
         setRecentlyPlayed(data);
       } else {
         console.log("Error: please try again")
@@ -70,7 +69,7 @@ export default function Home() {
       </Head>
       <main class="bg-mainBlack">
         {session ? (
-          <div className="min-h-[calc(100vh-70px)] grid 2xl:grid-cols-3 gap-6 xs: mx-5 lg:mx-[16rem] 2xl:mx-16 overflow-hidden">
+          <div className="min-h-[calc(100vh-70px)] grid 2xl:grid-cols-3 gap-6 xs: mx-5 lg:mx-[16rem] 2xl:mx-16 overflow-hidden py-5">
             <div className="bg-spotifyBlack rounded-lg p-2">
               <h1 className="text-white text-center text-2xl font-semibold">Recently played</h1>
               { recentlyPlayed && <CuratedResults media={recentlyPlayed}/> }
