@@ -12,13 +12,18 @@ module.exports = {
         spotifyBlack: "#242424",
         mainBlack: "#121212",
       },
+      visibility: ["group-hover"],
     },
     screens: {
+      xs: "0px",
+
       sm: "640px",
       // => @media (min-width: 640px) { ... }
 
       md: "768px",
       // => @media (min-width: 768px) { ... }
+
+      customMd: "870px",
 
       lg: "1024px",
       // => @media (min-width: 1024px) { ... }
@@ -34,5 +39,6 @@ module.exports = {
     require("prettier-plugin-tailwindcss"),
     require("flowbite/plugin"),
     require("tailwind-scrollbar"),
+    require('@tailwindcss/line-clamp'),
   ],
 };

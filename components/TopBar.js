@@ -1,20 +1,24 @@
-import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
+import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { useRef, useState } from "react";
-import { useRouter } from "next/router";
 import CategoryResults from "../components/CategoryResults";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
+import { useRouter } from "next/router";
+import Image from "next/image";
 
 export default function TopBar() {
-  const router = useRouter();
   const inputRef = useRef();
-  const supabase = useSupabaseClient();
   const session = useSession();
+  const supabase = useSupabaseClient();
+  const router = useRouter();
+  const user_name = session?.user?.user_metadata?.name;
+  const user_image = session?.user?.user_metadata?.avatar_url;
   const token = session?.provider_token;
 
   const [searchResults, setSearchResults] = useState();
   const [searchValue, setSearchValue] = useState();
   const [resultsHidden, setResultsHidden] = useState(true);
+  const [userOptionsDisplayed, setUserOptionsDisplayed] = useState(false);
 
   function searchSpotify(e) {
     e.preventDefault();
@@ -46,8 +50,8 @@ export default function TopBar() {
     <>
       {session ? (
         <>
-          <nav className="relative z-50 mx-auto w-full bg-mainBlack p-3 text-white">
-            <div className="flex items-center justify-between">
+          <nav className="fixed z-50 mx-auto w-full bg-mainBlack p-3 text-white">
+            <div className="flex items-center justify-between gap-2">
               <Link href={`/`}>
                 <div>
                   <p>Logo</p>
@@ -57,7 +61,7 @@ export default function TopBar() {
                 <form onSubmit={searchSpotify}>
                   <label
                     htmlFor="default-search"
-                    class="sr-only mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                    className="sr-only mb-2 text-sm font-medium text-gray-900 dark:text-white"
                   >
                     Search
                   </label>
@@ -72,9 +76,9 @@ export default function TopBar() {
                         xmlns="http://www.w3.org/2000/svg"
                       >
                         <path
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                          stroke-width="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="2"
                           d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
                         ></path>
                       </svg>
@@ -97,22 +101,35 @@ export default function TopBar() {
                   </div>
                 </form>
               </div>
-
+              
               <div>
-                <button
-                  onClick={async () => {
-                    await supabase.auth.signOut();
-                    router.push("/");
-                  }}
-                >
-                  Sign Out
+                <button className={`flex items-center xs:w-12 xs:h-12 customMd:w-auto customMd:h-auto`} onClick={() => setUserOptionsDisplayed(prevState => !prevState)}>
+                  <Image
+                    className={`rounded-full w-12 h-12 flex-shrink-0`}
+                    src={user_image && user_image}
+                    alt="Profile Pic"
+                    width={100}
+                    height={100}
+                  />
+                  <span className="pl-2 xs:hidden customMd:inline">{user_name}</span>
                 </button>
+              
+                {userOptionsDisplayed &&
+                  <button className="xs:right-1 customMd:right-auto bg-spotifyBlack drop-shadow-xl py-1 px-4 fixed mt-1 border-2 border-gray-600"
+                    onClick={async () => {
+                      await supabase.auth.signOut();
+                      router.push("/");
+                    }}
+                  >
+                    Logout
+                  </button> 
+                }
               </div>
             </div>
           </nav>
           <AnimatePresence>
             <motion.div
-              className={`fixed inset-x-0 z-20 mx-auto w-max ${
+              className={`fixed pt-20 inset-x-0 z-20 mx-auto w-max ${
                 resultsHidden ? `invisible` : `visible`
               }`}
               initial={{ opacity: 0 }}
@@ -137,27 +154,27 @@ export default function TopBar() {
                     <h1 className="text-center text-3xl font-semibold uppercase md:text-left">
                       Albums
                     </h1>
-                    <CategoryResults categories={searchResults.albums} />
+                    <CategoryResults categories={searchResults.albums} onClick={() => setResultsHidden(true)}/>
                     <h1 className="text-center text-3xl font-semibold uppercase md:text-left">
                       Artists
                     </h1>
-                    <CategoryResults categories={searchResults.artists} />
+                    <CategoryResults categories={searchResults.artists} onClick={() => setResultsHidden(true)}/>
                     <h1 className="text-center text-3xl font-semibold uppercase md:text-left">
                       Tracks
                     </h1>
-                    <CategoryResults categories={searchResults.tracks} />
+                    <CategoryResults categories={searchResults.tracks} onClick={() => setResultsHidden(true)}/>
                     <h1 className="text-center text-3xl font-semibold uppercase md:text-left">
                       Shows
                     </h1>
-                    <CategoryResults categories={searchResults.shows} />
+                    <CategoryResults categories={searchResults.shows} onClick={() => setResultsHidden(true)}/>
                     <h1 className="text-center text-3xl font-semibold uppercase md:text-left">
                       Audiobooks
                     </h1>
-                    <CategoryResults categories={searchResults.audiobooks} />
+                    <CategoryResults categories={searchResults.audiobooks} onClick={() => setResultsHidden(true)}/>
                     <h1 className="text-center text-3xl font-semibold uppercase md:text-left">
                       Playlists
                     </h1>
-                    <CategoryResults categories={searchResults.playlists} />
+                    <CategoryResults categories={searchResults.playlists} onClick={() => setResultsHidden(true)}/>
                   </div>
                 </>
               ) : null}

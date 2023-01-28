@@ -18,6 +18,7 @@ function CategoryResults(props) {
                   exit={{ opacity: 0 }}
                   whileHover={{ scale: 1.05 }}
                   className="max-w-[15rem] p-1"
+                  onClick={props.onClick}
                 >
                   <img
                     className="m-auto max-w-[12rem] cursor-pointer drop-shadow-lg"

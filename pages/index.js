@@ -8,6 +8,7 @@ import { useEffect, useRef, useState } from "react";
 import CategoryResults from "../components/CategoryResults";
 import { createServerSupabaseClient } from '@supabase/auth-helpers-nextjs';
 import CuratedResults from "../components/CuratedResults";
+import { getRefreshedToken } from "../lib/spotify";
 
 export default function Home() {
   const inputRef = useRef();
@@ -16,10 +17,19 @@ export default function Home() {
   const token = session?.provider_token;
 
   const [recentlyPlayed, setRecentlyPlayed] = useState();
+  const [recentlyCommented, setCommented] = useState();
+  const [newReleases, setNewReleases] = useState();
 
   useEffect(() => {
-    getRecentlyPlayed(token);
-  }, [session])
+    if(token) {
+      getRecentlyPlayed(token);
+      getNewReleases(token);
+    }
+  }, [token]);
+
+  useEffect(() => {
+    getRecentlyCommentedOn();
+  }, [])
 
   async function signInWithSpotify() {
     try {
@@ -53,8 +63,42 @@ export default function Home() {
         const data = await response.json();
         setRecentlyPlayed(data);
       } else {
-        console.log("Error: please try again")
         setRecentlyPlayed(null);
+      }
+    });
+  }
+
+  async function getRecentlyCommentedOn() {
+    fetch("/api/comments/retrieve", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        recentlyCommentedOn: true
+      })
+    }).then(async (response) => {
+      if (response.ok) {
+        const data = await response.json();
+        setCommented(data);
+      } else {
+        setCommented(null);
+      }
+    });
+  }
+
+  async function getNewReleases(token) {
+    fetch("/api/spotify", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        token,
+        newReleases: true
+      })
+    }).then(async (response) => {
+      if (response.ok) {
+        const data = await response.json();
+        setNewReleases(data);
+      } else {
+        setNewReleases(null);
       }
     });
   }
@@ -67,20 +111,20 @@ export default function Home() {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <main class="bg-mainBlack">
+      <main className="bg-mainBlack pt-12 min-h-screen">
         {session ? (
-          <div className="min-h-[calc(100vh-70px)] grid 2xl:grid-cols-3 gap-6 xs: mx-5 lg:mx-[16rem] 2xl:mx-16 overflow-hidden py-5">
+          <div className="grid 2xl:grid-cols-3 gap-6 xs:mx-5 lg:mx-[16rem] 2xl:mx-16 overflow-hidden py-5">
             <div className="bg-spotifyBlack rounded-lg p-2">
-              <h1 className="text-white text-center text-2xl font-semibold">Recently played</h1>
+              <h1 className="text-white text-center text-2xl font-semibold">Recently Played</h1>
               { recentlyPlayed && <CuratedResults media={recentlyPlayed}/> }
             </div>
             <div className="bg-spotifyBlack rounded-lg p-2">
-              <h1 className="text-white text-center text-2xl font-semibold ml-5">Recently active</h1>
-              { recentlyPlayed && <CuratedResults media={recentlyPlayed}/> }
+              <h1 className="text-white text-center text-2xl font-semibold ml-5">Recently Active</h1>
+              { recentlyCommented && <CuratedResults media={recentlyCommented}/> }
             </div>
             <div className="bg-spotifyBlack rounded-lg p-2">
-              <h1 className="text-white text-center text-2xl font-semibold">Hot topics</h1>
-              { recentlyPlayed && <CuratedResults media={recentlyPlayed}/> }
+              <h1 className="text-white text-center text-2xl font-semibold">New Releases</h1>
+              { recentlyPlayed && <CuratedResults media={newReleases}/> }
             </div>
           </div>
         ) : (

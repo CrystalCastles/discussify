@@ -1,3 +1,9 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+  p:not(.comment), h1, h2, span {
+    @apply line-clamp-3;
+  }
+}

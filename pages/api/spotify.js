@@ -1,4 +1,4 @@
-import { getRecentlyPlayed, spotifySearch } from "../../lib/spotify";
+import { getNewReleases, getRecentlyPlayed, spotifySearch } from "../../lib/spotify";
 
 export default async function handler(req, res) {
   if(req.method !== "POST") {
@@ -8,15 +8,20 @@ export default async function handler(req, res) {
   const { token } = req.body;
   const { query } = req.body;
   const { recent } = req.body;
+  const { newReleases } = req.body;
 
-  if(!token || (!query && !recent)) {
+  if(!token || (!query && !recent && !newReleases)) {
     return res.status(400).end();
   }
 
   if(recent) {
     const recentlyPlayed = await getRecentlyPlayed(token);
-    console.log("recently played " + recentlyPlayed)
+
     if(!recentlyPlayed || recentlyPlayed.error) {
+      if(recentlyPlayed.error.status === 401 || recentlyPlayed.error.message == 'The access token expired') {
+        return res.status(401).send('The access token expired');
+      }
+
       return res.status(400).end();
     }
 
@@ -29,6 +34,13 @@ export default async function handler(req, res) {
     }
 
     res.json(searchResults);
+  } else if(newReleases) {
+    const newReleases = await getNewReleases(token);
+
+    if(!newReleases || newReleases.error) {
+      return res.status(400).end();
+    }
+    res.json(newReleases);
   }
 
   res.end();
