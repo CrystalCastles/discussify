@@ -1,35 +1,52 @@
 import Head from "next/head";
 import {
-  useUser,
   useSupabaseClient,
   useSession,
 } from "@supabase/auth-helpers-react";
-import { useEffect, useRef, useState } from "react";
-import CategoryResults from "../components/CategoryResults";
-import { createServerSupabaseClient } from '@supabase/auth-helpers-nextjs';
+import { useEffect, useState } from "react";
 import CuratedResults from "../components/CuratedResults";
-import { getRefreshedToken } from "../lib/spotify";
+import nookies from 'nookies';
+import { parseCookies, setCookie, destroyCookie } from 'nookies';
 
 export default function Home() {
-  const inputRef = useRef();
   const supabase = useSupabaseClient();
   const session = useSession();
-  const token = session?.provider_token;
-
+  // console.log(session)
   const [recentlyPlayed, setRecentlyPlayed] = useState();
   const [recentlyCommented, setCommented] = useState();
   const [newReleases, setNewReleases] = useState();
-
-  useEffect(() => {
-    if(token) {
-      getRecentlyPlayed(token);
-      getNewReleases(token);
-    }
-  }, [token]);
+  // const [token, setToken] = useState();
+  nookies.set(null, 'Testing2', 'test2');
+  const cookies = parseCookies()
+  console.log({ cookies })
 
   useEffect(() => {
     getRecentlyCommentedOn();
-  }, [])
+  }, []);
+
+  useEffect(() => {
+    if(session) {
+      if (typeof window !== 'undefined') {
+        // Perform localStorage action
+        if(!localStorage.getItem('__spotifyToken')) {
+          localStorage.setItem('__spotifyToken', session.provider_token);
+        }
+        if(!localStorage.getItem('__spotifyRefreshToken')) {
+          localStorage.setItem('__spotifyRefreshToken', session.provider_refresh_token);
+        }
+      }
+      // setToken(session.provider_token);
+    }
+  }, [session]);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      // Perform localStorage action
+      if(localStorage.getItem('__spotifyToken')) {
+        getSpotifyData(localStorage.getItem('__spotifyToken'));
+      }
+    }
+  }, []);
 
   async function signInWithSpotify() {
     try {
@@ -38,10 +55,16 @@ export default function Home() {
           provider: "spotify",
           options: {
             scopes: "user-read-recently-played",
+            // queryParams: {
+            //   show_dialog: true,
+            // },
           }
         },
       );
-      if (error) {
+      if(data) {
+        console.log(data)
+      }
+      else if (error) {
         alert("Error with auth: " + error.message);
       }
     } catch {
@@ -51,7 +74,7 @@ export default function Home() {
   }
 
   async function getRecentlyPlayed(token) {
-    fetch("/api/spotify", {
+    return fetch("/api/spotify", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -64,6 +87,7 @@ export default function Home() {
         setRecentlyPlayed(data);
       } else {
         setRecentlyPlayed(null);
+        return response.status;
       }
     });
   }
@@ -103,6 +127,28 @@ export default function Home() {
     });
   }
 
+  async function getSpotifyData(token) {
+    let recentlyPlayedStatus = await getRecentlyPlayed(token);
+    if(recentlyPlayedStatus === 401) {
+      return fetch("/api/spotify", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          refreshToken: localStorage.getItem('__spotifyRefreshToken'),
+        })
+      }).then(async (response) => {
+        if (response.ok) {
+          const data = await response.json();
+          localStorage.setItem('__spotifyToken', data.access_token);
+          return getSpotifyData(data.access_token);
+        } else {
+          console.log("Error refreshing token.")
+        }
+      });
+    }
+    await getNewReleases(token);
+  }
+
   return (
     <>
       <Head>
@@ -113,17 +159,17 @@ export default function Home() {
       </Head>
       <main className="bg-mainBlack pt-12 min-h-screen">
         {session ? (
-          <div className="grid 2xl:grid-cols-3 gap-6 xs:mx-5 lg:mx-[16rem] 2xl:mx-16 overflow-hidden py-5">
-            <div className="bg-spotifyBlack rounded-lg p-2">
-              <h1 className="text-white text-center text-2xl font-semibold">Recently Played</h1>
+          <div className="grid lg:grid-cols-1 xl:grid-cols-2 2xl:grid-cols-3 gap-10 xs:mx-5 overflow-hidden py-5">
+            <div className="">
+              <h1 className="text-white text-center text-2xl font-semibold">RECENTLY PLAYED</h1>
               { recentlyPlayed && <CuratedResults media={recentlyPlayed}/> }
             </div>
-            <div className="bg-spotifyBlack rounded-lg p-2">
-              <h1 className="text-white text-center text-2xl font-semibold ml-5">Recently Active</h1>
+            <div className="">
+              <h1 className="text-white text-center text-2xl font-semibold ml-5">RECENTLY ACTIVE</h1>
               { recentlyCommented && <CuratedResults media={recentlyCommented}/> }
             </div>
-            <div className="bg-spotifyBlack rounded-lg p-2">
-              <h1 className="text-white text-center text-2xl font-semibold">New Releases</h1>
+            <div className="">
+              <h1 className="text-white text-center text-2xl font-semibold">NEW RELEASES</h1>
               { recentlyPlayed && <CuratedResults media={newReleases}/> }
             </div>
           </div>

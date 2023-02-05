@@ -55,7 +55,7 @@ export default function InputArea(props) {
         }
         // if (response.ok) {
         //   const data = await response.json();
-        //   await mutate((currentData) => [data, ...(currentData ?? []), true])
+        //   await mutate((currentData) => [...currentData, data])
         // }  
       });
   }

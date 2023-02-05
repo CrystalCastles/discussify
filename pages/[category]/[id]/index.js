@@ -4,8 +4,18 @@ import MediaCard from '../../../components/MediaCard';
 import CommentArea from '../../../components/CommentArea';
 import { getMediaById } from '../../../lib/spotify';
 import { getMediaContent, addMediaContent, getComments, commentsUpdated } from '../../../lib/supabase';
+import { useRouter } from 'next/router';
+import nookies from 'nookies';
 
 export default function ContentPage(props) {
+  // const router = useRouter();
+  // const { category } = router.query;
+  // const { id } = router.query;
+  
+  // async function retrieveMediaContent(id) {
+  //   fetch()
+  // }
+  
   return (
     <main className="bg-mainBlack px-5 pt-16 min-h-screen overflow-hidden">
       <MediaCard mediaData={props.mediaData} />
@@ -15,6 +25,9 @@ export default function ContentPage(props) {
 }
 
 export async function getServerSideProps(ctx) {
+  const cookies = nookies.get(ctx);
+  console.log(cookies)
+
   const supabase = createServerSupabaseClient(ctx)
   // Check if we have a session
   const {

@@ -13,7 +13,7 @@ export default function TopBar() {
   const router = useRouter();
   const user_name = session?.user?.user_metadata?.name;
   const user_image = session?.user?.user_metadata?.avatar_url;
-  const token = session?.provider_token;
+  // const token = session?.provider_token;
 
   const [searchResults, setSearchResults] = useState();
   const [searchValue, setSearchValue] = useState();
@@ -34,15 +34,33 @@ export default function TopBar() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         query: inputRef.current.value,
-        token,
+        token: localStorage.getItem('__spotifyToken'),
       }),
     }).then(async (response) => {
       if (response.ok) {
         const data = await response.json();
         setSearchResults(data);
       } else {
-        console.log("Error: please try again");
-        setSearchResults(null);
+        if(response.status === 401) {
+          return fetch("/api/spotify", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              refreshToken: localStorage.getItem('__spotifyRefreshToken'),
+            })
+          }).then(async (response) => {
+            if (response.ok) {
+              const data = await response.json();
+              localStorage.setItem('__spotifyToken', data.access_token);
+              return searchSpotify(data.access_token);
+            } else {
+              console.log("Error refreshing token.")
+            }
+          });
+        } else {
+          setSearchResults(null);
+          console.log("Error: please try again");
+        }
       }
     });
   }
@@ -143,7 +161,7 @@ export default function TopBar() {
                     className="fixed left-0 bottom-0 h-full w-full bg-mainBlack opacity-80"
                   ></div>
                   <div
-                    className={`max-h-[70rem] max-w-[110rem] overflow-y-auto rounded-xl bg-spotifyGreen p-2 drop-shadow-md overflow-x-hidden scrollbar-thin scrollbar-track-gray-100 scrollbar-thumb-gray-900`}
+                    className={`max-h-[67rem] max-w-[110rem] overflow-y-auto rounded-xl bg-spotifyGreen p-2 drop-shadow-md overflow-x-hidden scrollbar-thin scrollbar-track-gray-100 scrollbar-thumb-gray-900`}
                   >
                     <span
                       onClick={() => setResultsHidden(true)}
