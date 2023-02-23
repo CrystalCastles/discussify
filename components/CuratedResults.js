@@ -20,7 +20,7 @@ function CuratedResults(props) {
                     className="m-auto mt-3 p-3 xs:w-[10rem] 2sm:w-[14rem] bg-spotifyBlack xs:h-[15rem] 2sm:h-[19rem] rounded-lg"
                   >
                     <img
-                      className="m-auto w-[13rem] cursor-pointer drop-shadow-lg"
+                      className="m-auto w-[13rem] max-h-[15rem] cursor-pointer drop-shadow-lg"
                       src={item.track.album.images[1].url || placeholderImage.src}
                       alt={item.track.name}
                     />
@@ -35,7 +35,7 @@ function CuratedResults(props) {
               );
             })
           ) : (
-            <span className="float-left text-lg text-white">No results.</span>
+            <span className="text-[1.5rem] text-white">No results.</span>
           )}
         </>
         : props.media?.albums ?
@@ -52,7 +52,7 @@ function CuratedResults(props) {
                   className="m-auto mt-3 p-3 xs:w-[10rem] 2sm:w-[14rem] bg-spotifyBlack xs:h-[15rem] 2sm:h-[19rem] rounded-lg"
                 >
                   <img
-                    className="m-auto w-[13rem] cursor-pointer drop-shadow-lg"
+                    className="m-auto w-[13rem] max-h-[15rem] cursor-pointer drop-shadow-lg"
                     src={item.images[1].url || placeholderImage.src}
                     alt={item.name}
                   />
@@ -67,7 +67,7 @@ function CuratedResults(props) {
             );
           })
         ) : (
-          <span className="float-left text-lg text-white">No results.</span>
+          <span className="text-[1.5rem] text-white">No results.</span>
         )}
         </>
         :
@@ -84,7 +84,7 @@ function CuratedResults(props) {
                     className="m-auto mt-3 p-3 xs:w-[10rem] 2sm:w-[14rem] bg-spotifyBlack xs:h-[15rem] 2sm:h-[19rem] rounded-lg"
                   >
                     <img
-                      className="m-auto w-[13rem] cursor-pointer drop-shadow-lg"
+                      className="m-auto w-[13rem] max-h-[15rem] cursor-pointer drop-shadow-lg"
                       src={item.media_img || placeholderImage.src}
                       alt={item.media_name}
                     />
@@ -99,7 +99,7 @@ function CuratedResults(props) {
               );
             })
           ) : (
-            <span className="float-left text-lg text-white">No results.</span>
+            <span className="text-[1.5rem] text-white">No results.</span>
           )}
         </>
         }

@@ -13,7 +13,8 @@ export default function CommentArea(props) {
   const {data: comments, mutate} = useGetComments(mediaId);
   const [updatedComments, setComments] = useState(props.initialComments);
   const [snapType, setSnapType] = useState("mandatory");
-  const [channel, setChannel] = useState()
+  const [channel, setChannel] = useState();
+  
   useEffect(() => {
     if(comments) {
       setComments(comments);
@@ -27,7 +28,7 @@ export default function CommentArea(props) {
     setChannel(
       supabase
         .channel(channel)
-        .on('postgres_changes', { event: '*', schema: 'public', table: 'media_comments' }, (payload) => {
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'media_comments', filter: `chat_id=eq.${mediaId}` }, (payload) => {
           console.log(payload)
           if(payload.eventType === "INSERT") {
             mutate((currentData) => [...currentData, payload.new])
@@ -46,14 +47,12 @@ export default function CommentArea(props) {
   }, [channel, mutate]);
 
   useEffect(() => {
-    setTimeout(() => {
-      setSnapType("proximity");
-    }, 1000);
+    setSnapType("proximity");
   }, []);
   
   return (
     <div className="mx-auto max-w-[100rem]">
-      <div className={`h-[36rem] overflow-y-scroll overflow-x-hidden scrollbar-thumb-spotifyBlack scrollbar-track-gray-100 scrollbar-thin snap-y snap-${snapType} overscroll-y-contain`}>
+      <div className={`h-[43rem] overflow-y-scroll overflow-x-hidden scrollbar-thumb-spotifyBlack scrollbar-track-gray-100 scrollbar-thin snap-y snap-${snapType} overscroll-y-contain`}>
         {updatedComments.length > 0 ? updatedComments?.map((content) => {
           return <Comment className="last:snap-end" key={content.id} comment={content} session={props.session}/>
         }) : <h1 className="text-white text-center mt-16 text-lg">No comments, be the first!</h1>}

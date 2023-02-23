@@ -17,13 +17,13 @@ export default function MediaCard(props) {
           whileHover={{ scale: 1.03 }}
           className="xs:mx-auto md:mx-0 max-w-[28rem] p-1 xs:row-span-1 xs:col-start-1 xs:col-end-7 sm:col-start-1 sm:col-end-4 lg:row-span-3 lg:col-span-2"
         >
-          <Link href={props.mediaData.media_link}>
+          <a target="_blank" href={props.mediaData.media_link} rel="noopener noreferrer">
             <img
               className="drop-shadow-lg w-auto max-h-[28rem]"
               src={props.mediaData.media_img || placeholderImage.src}
               alt={props.mediaData.media_name}
             />
-          </Link>
+          </a>
         </motion.div>
         <div className="text-white xs:[&>p]:text-lg xs:[&>h1]:text-[2rem] md:[&>p]:text-xl md:[&>h1]:text-[3rem] lg:[&>p]:text-2xl lg:[&>h1]:text-[4rem] relative xs:row-span-1 xs:col-start-1 xs:col-end-7 xs:text-center sm:text-left sm:col-start-4 sm:col-end-7 lg:row-span-2 lg:col-span-3">
           <h2>{props.mediaData.media_type.toUpperCase()}</h2>

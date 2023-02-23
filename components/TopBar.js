@@ -5,6 +5,8 @@ import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { useRouter } from "next/router";
 import Image from "next/image";
+import nookies from 'nookies';
+import { parseCookies } from 'nookies';
 
 export default function TopBar() {
   const inputRef = useRef();
@@ -13,7 +15,7 @@ export default function TopBar() {
   const router = useRouter();
   const user_name = session?.user?.user_metadata?.name;
   const user_image = session?.user?.user_metadata?.avatar_url;
-  // const token = session?.provider_token;
+  const cookies = parseCookies();
 
   const [searchResults, setSearchResults] = useState();
   const [searchValue, setSearchValue] = useState();
@@ -34,7 +36,7 @@ export default function TopBar() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         query: inputRef.current.value,
-        token: localStorage.getItem('__spotifyToken'),
+        token: cookies['__spotifyToken'],
       }),
     }).then(async (response) => {
       if (response.ok) {
@@ -46,12 +48,12 @@ export default function TopBar() {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
-              refreshToken: localStorage.getItem('__spotifyRefreshToken'),
+              refreshToken: cookies['__spotifyRefreshToken'],
             })
           }).then(async (response) => {
             if (response.ok) {
               const data = await response.json();
-              localStorage.setItem('__spotifyToken', data.access_token);
+              nookies.set(null, '__spotifyToken', data.access_token);
               return searchSpotify(data.access_token);
             } else {
               console.log("Error refreshing token.")
@@ -72,7 +74,7 @@ export default function TopBar() {
             <div className="flex items-center justify-between gap-2">
               <Link href={`/`}>
                 <div>
-                  <p>Logo</p>
+                  <p className="font-bold">DISCUSSIFY</p>
                 </div>
               </Link>
               <div className="w-[40rem]">
@@ -135,6 +137,8 @@ export default function TopBar() {
                 {userOptionsDisplayed &&
                   <button className="xs:right-1 customMd:right-auto bg-spotifyBlack drop-shadow-xl py-1 px-4 fixed mt-1 border-2 border-gray-600"
                     onClick={async () => {
+                      nookies.destroy(null, '__spotifyToken');
+                      nookies.destroy(null, '__spotifyRefreshToken');
                       await supabase.auth.signOut();
                       router.push("/");
                     }}

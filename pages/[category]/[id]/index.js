@@ -1,11 +1,10 @@
 import { createServerSupabaseClient } from '@supabase/auth-helpers-nextjs';
-import { useEffect } from 'react';
 import MediaCard from '../../../components/MediaCard';
 import CommentArea from '../../../components/CommentArea';
-import { getMediaById } from '../../../lib/spotify';
+import { getMediaById, getRefreshedToken } from '../../../lib/spotify';
 import { getMediaContent, addMediaContent, getComments, commentsUpdated } from '../../../lib/supabase';
-import { useRouter } from 'next/router';
 import nookies from 'nookies';
+import Head from 'next/head';
 
 export default function ContentPage(props) {
   // const router = useRouter();
@@ -15,19 +14,22 @@ export default function ContentPage(props) {
   // async function retrieveMediaContent(id) {
   //   fetch()
   // }
-  
+
   return (
-    <main className="bg-mainBlack px-5 pt-16 min-h-screen overflow-hidden">
-      <MediaCard mediaData={props.mediaData} />
-      <CommentArea initialComments={props.initialComments} session={props.initialSession}/>
-    </main>
+    <>
+      <Head>
+        <title>{`Discussify - ${props.mediaData.media_name ? props.mediaData.media_name : props.mediaData.artist_name}`}</title>
+      </Head>
+      <main className="bg-mainBlack px-5 pt-16 min-h-screen overflow-hidden">
+        <MediaCard mediaData={props.mediaData} />
+        <CommentArea initialComments={props.initialComments} session={props.initialSession}/>
+      </main>
+    </>
   )
 }
 
 export async function getServerSideProps(ctx) {
   const cookies = nookies.get(ctx);
-  console.log(cookies)
-
   const supabase = createServerSupabaseClient(ctx)
   // Check if we have a session
   const {
@@ -36,7 +38,6 @@ export async function getServerSideProps(ctx) {
   
   const { category } = ctx.params;
   const { id } = ctx.params;
-  const token = session?.provider_token;
 
   if(!session || !session?.user?.user_metadata?.name || !session.provider_token || !ctx.params) {
     await supabase.auth.signOut();
@@ -51,7 +52,12 @@ export async function getServerSideProps(ctx) {
   let mediaData = await getMediaContent(id);
   
   if(!mediaData) {
-    let media = await getMediaById(token, category, id)
+    let media = await getMediaById(cookies['__spotifyToken'], category, id);
+    if(media?.error?.status === 401) {
+      const { access_token } = await getRefreshedToken(cookies['__spotifyRefreshToken']);
+      nookies.set(ctx, '__spotifyToken', access_token);
+      media = await getMediaById(access_token, category, id);
+    }
     
     mediaData = {id: media.id, media_type: media.type, media_img: media.type == "track"
     ? (media.album.images[0]?.url || media.album.images[1]?.url || media.album.images[2]?.url || null)

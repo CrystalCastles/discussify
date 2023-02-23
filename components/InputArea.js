@@ -72,7 +72,7 @@ export default function InputArea(props) {
   }
   
   return (
-    <form onSubmit={addComment} className="mx-auto flex">
+    <form onSubmit={addComment} className="mx-auto flex pb-5">
       <input type="text" disabled={chatCooldown} placeholder={`${chatCooldown ? "Please wait before sending another message." : "Enter comment here..."} `} className="text-white flex-1 border-b-2 border-l-0 border-r-0 border-t-0 border-white focus:border-spotifyGreen outline-none bg-transparent disabled:opacity-50 disabled:cursor-not-allowed focus:ring-0" value={input} onChange={(e) => setInput(e.target.value)} />
       <button type="submit" disabled={!input} className="px-3 py-2 font-bold text-white text-sm bg-spotifyBlack rounded-2xl hover:bg-spotifyGreen disabled:opacity-50 disabled:cursor-not-allowed">
         Comment

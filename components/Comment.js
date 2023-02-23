@@ -5,6 +5,8 @@ import TimeAgo from 'react-timeago'
 export default function Comment(props){
   const user = props.session.user;
   const commenterId = props.session.user.id;
+  let date = new Date(props.comment.created_at);
+  date = date.setSeconds(date.getSeconds() - 2);
 
   async function deleteComment(id) {
     fetch("/api/comments/remove", {
@@ -41,7 +43,7 @@ export default function Comment(props){
           </p>
           <p
             className={`text-[0.8rem] italic px-1 text-gray-600 text-right`}>
-            <TimeAgo date={props.comment.created_at} suppressHydrationWarning={true}/>
+            <TimeAgo date={date} suppressHydrationWarning={true}/>
           </p>
           {props.comment.commenter_name === user.user_metadata.name && <p className="text-white cursor-pointer text-[0.8rem] invisible group-hover:visible ml-1" onClick={() => deleteComment(props.comment.id)}>x</p> }
         </div>
