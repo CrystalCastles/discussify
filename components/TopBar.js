@@ -74,7 +74,7 @@ export default function TopBar() {
             <div className="flex items-center justify-between gap-2">
               <Link href={`/`}>
                 <div>
-                  <p className="font-bold">DISCUSSIFY</p>
+                  <p className="font-bold">BANTAFY</p>
                 </div>
               </Link>
               <div className="w-[40rem]">
