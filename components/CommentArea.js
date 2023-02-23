@@ -29,7 +29,6 @@ export default function CommentArea(props) {
       supabase
         .channel(channel)
         .on('postgres_changes', { event: '*', schema: 'public', table: 'media_comments', filter: `chat_id=eq.${mediaId}` }, (payload) => {
-          console.log(payload)
           if(payload.eventType === "INSERT") {
             mutate((currentData) => [...currentData, payload.new])
           } else if (payload.eventType === "DELETE") {
