@@ -18,7 +18,7 @@ export default function ContentPage(props) {
   return (
     <>
       <Head>
-        <title>{`Discussify - ${props.mediaData.media_name ? props.mediaData.media_name : props.mediaData.artist_name}`}</title>
+        <title>{`Bantafy - ${props.mediaData.media_name ? props.mediaData.media_name : props.mediaData.artist_name}`}</title>
       </Head>
       <main className="bg-mainBlack px-5 pt-16 min-h-screen overflow-hidden">
         <MediaCard mediaData={props.mediaData} />
