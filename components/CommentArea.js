@@ -1,7 +1,6 @@
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { useGetComments } from "../hooks/useGetComments";
-import { commentsUpdated, getComments } from "../lib/supabase";
 import InputArea from "./InputArea"
 import Comment from "./Comment"
 import { useSupabaseClient } from "@supabase/auth-helpers-react";
@@ -51,7 +50,7 @@ export default function CommentArea(props) {
   
   return (
     <div className="mx-auto max-w-[100rem]">
-      <div className={`h-[43rem] overflow-y-scroll overflow-x-hidden scrollbar-thumb-spotifyBlack scrollbar-track-gray-100 scrollbar-thin snap-y snap-${snapType} overscroll-y-contain`}>
+      <div className={`h-[41rem] overflow-y-scroll overflow-x-hidden scrollbar-thumb-spotifyBlack scrollbar-track-gray-100 scrollbar-thin snap-y snap-${snapType} overscroll-y-contain`}>
         {updatedComments.length > 0 ? updatedComments?.map((content) => {
           return <Comment className="last:snap-end" key={content.id} comment={content} session={props.session}/>
         }) : <h1 className="text-white text-center mt-16 text-lg">No comments, be the first!</h1>}

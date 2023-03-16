@@ -23,6 +23,7 @@ export default function MediaCard(props) {
               src={props.mediaData.media_img || placeholderImage.src}
               alt={props.mediaData.media_name}
             />
+            <p className="text-white text-center pt-2">Listen On <img className="h-6 m-auto inline" src="https://storage.googleapis.com/pr-newsroom-wp/1/2018/11/Spotify_Logo_CMYK_White.png"></img></p>
           </a>
         </motion.div>
         <div className="text-white xs:[&>p]:text-lg xs:[&>h1]:text-[2rem] md:[&>p]:text-xl md:[&>h1]:text-[3rem] lg:[&>p]:text-2xl lg:[&>h1]:text-[4rem] relative xs:row-span-1 xs:col-start-1 xs:col-end-7 xs:text-center sm:text-left sm:col-start-4 sm:col-end-7 lg:row-span-2 lg:col-span-3">
