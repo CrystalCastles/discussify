@@ -160,7 +160,7 @@ export default function Home() {
               </div>
               <div className="">
                 <h1 className="text-white text-center text-2xl font-semibold">NEW RELEASES</h1>
-                { recentlyPlayed && <CuratedResults media={newReleases}/> }
+                { newReleases && <CuratedResults media={newReleases}/> }
               </div>
             </div>
             <Footer />
