@@ -65,22 +65,22 @@ export async function getServerSideProps(ctx) {
 
     switch(media.type) {
       case 'artist':
-        mediaData = { ...mediaData, artist_name: media.name}
+        mediaData = { ...mediaData, artist_name: media.name }
         break;
       case 'album':
-        mediaData = { ...mediaData, media_release_date: media.release_date, media_count: media.total_tracks, artist_name: media.artists[0].name}
+        mediaData = { ...mediaData, media_release_date: media.release_date, media_count: media.total_tracks, artist_name: media.artists[0].name }
         break;
       case 'track':
-        mediaData = { ...mediaData, media_release_date: media.album.release_date, media_duration: media.duration_ms, artist_name: media.artists[0].name, album_name: media.album.name, media_preview: media. preview_url}
+        mediaData = { ...mediaData, media_release_date: media.album.release_date, media_duration: media.duration_ms, artist_name: media.artists[0].name, album_name: media.album.name, media_preview: media. preview_url }
         break;
       case 'show':
-        mediaData = { ...mediaData, media_count: media.total_episodes, artist_name: media.publisher}
+        mediaData = { ...mediaData, media_count: media.total_episodes, artist_name: media.publisher }
         break;
       case 'audiobook':
-        mediaData = { ...mediaData, artist_name: media.authors[0].name}
+        mediaData = { ...mediaData, artist_name: media.authors[0].name }
         break;
       case 'playlist':
-        mediaData = { ...mediaData, media_count: media.tracks.total, artist_name: media.owner.display_name}
+        mediaData = { ...mediaData, media_count: media.tracks.total, artist_name: media.owner.display_name }
         break;
     }
     await addMediaContent(mediaData);

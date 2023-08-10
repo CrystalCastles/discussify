@@ -163,7 +163,6 @@ export default function Home() {
                 { newReleases && <CuratedResults media={newReleases}/> }
               </div>
             </div>
-            <Footer />
           </>
         ) : (
           <div className="flex h-screen items-center justify-center">
@@ -181,6 +180,7 @@ export default function Home() {
             </AnimatePresence>
           </div>
         )}
+        <Footer />
       </main>
     </>
   );

@@ -28,7 +28,7 @@ export default function Comment(props){
       <div className={`flex-shrink-0 order-1 pt-2`}>
         <Image
           className={`object-cover mx-2 rounded-full w-10 h-10`}
-          src={props.comment.commenter_avatar ? props.comment.commenter_avatar : "https://i.scdn.co/image/ab6775700000ee85370f9e91c1e33cffcc901240"}
+          src={props.comment.commenter_avatar ? props.comment.commenter_avatar : "https://developer.spotify.com/images/guidelines/design/icon4@2x.png"}
           alt="Profile Pic"
           width={100}
           height={100}

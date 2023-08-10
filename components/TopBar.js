@@ -126,7 +126,7 @@ export default function TopBar() {
                 <button className={`flex items-center xs:w-12 xs:h-12 customMd:w-auto customMd:h-auto`} onClick={() => setUserOptionsDisplayed(prevState => !prevState)}>
                   <Image
                     className={`rounded-full w-12 h-12 flex-shrink-0`}
-                    src={user_image && user_image}
+                    src={user_image ? user_image : "https://developer.spotify.com/images/guidelines/design/icon4@2x.png"}
                     alt="Profile Pic"
                     width={100}
                     height={100}
@@ -203,7 +203,17 @@ export default function TopBar() {
             </motion.div>
           </AnimatePresence>
         </>
-      ) : null}
+      ) : 
+      <nav className="fixed z-50 mx-auto w-full bg-mainBlack p-3 text-white">
+        <div className="flex items-center justify-between gap-2">
+          <Link href={`/`}>
+            <div>
+              <p className="font-bold">BANTAFY</p>
+            </div>
+          </Link>
+        </div>
+      </nav>
+      }
     </>
   );
 }

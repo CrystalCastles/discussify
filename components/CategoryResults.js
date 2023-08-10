@@ -21,7 +21,7 @@ function CategoryResults(props) {
                     onClick={props.onClick}       
                   >
                     <img
-                      className="m-auto max-w-[12rem] cursor-pointer drop-shadow-lg"
+                      className="m-auto max-w-[12rem] cursor-pointer drop-shadow-lg shadow-lg"
                       src={
                         category.type == "track"
                           ? category.album.images[1]?.url || placeholderImage.src
