@@ -30,7 +30,7 @@ export default function ContentPage(props) {
 
 export async function getServerSideProps(ctx) {
   const cookies = nookies.get(ctx);
-  const supabase = createServerSupabaseClient(ctx)
+  const supabase = createServerSupabaseClient(ctx);
   // Check if we have a session
   const {
     data: { session },

@@ -118,7 +118,7 @@ export default function Home() {
   async function getSpotifyData(token) {
     let recentlyPlayedStatus = await getRecentlyPlayed(token);
     if(recentlyPlayedStatus === 401) {
-      return fetch("/api/spotify", {
+      fetch("/api/spotify", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

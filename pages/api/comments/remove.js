@@ -6,9 +6,9 @@ export default async function handler(req, res) {
   }
 
   const { id } = req.body;
-  const { commenterId } = req.body;
+  const { userId } = req.body;
 
-  let removedComment = await deleteComment(id, commenterId);
+  let removedComment = await deleteComment(id, userId);
 
   res.status(200).json(removedComment)
 }
